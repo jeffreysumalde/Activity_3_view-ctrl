@@ -9,26 +9,29 @@ sap.ui.define([
             
         },
 
-    //  onAddItem: function (){
-    //       this.fnDisplayMsg("Add button pressed");
-    //  },
-    
         onAddItem: function (){
-            let oTextBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            let sMsg = oTextBundle.getText("addButtonMsg");
-            let sMsgempty = oTextBundle.getText("Error");
-         
-            let oView = this.getView();
-            let fName = oView.byId("idInptFName").getValue();
-            let lName = oView.byId("idInptLName").getValue();
-            if (fName ==="" && lName ==="") {
-                this.fnDisplayMsg(sMsgempty);
-                return;
-            }else{
-                this.fnDisplayMsg(sMsg);
-                return;
-            };
+            // Comment this code for now
+            // var oTextBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            // var sMsg = oTextBundle.getText("addButtonMsg");
+            // this.fnDisplayMsg(sMsg);
+
+            // Instantiate the fragment
+
+            // create dialog lazily
+            if (!this.oDialog) {
+                // By using loadFragment, we are adding the fragment as a dependent to the View
+                // By doing so, we can use the functions inside the view's controller
+                this.oDialog = this.loadFragment({
+                    name: "exer1sumalde.project1.fragment.productDialog"
+                });
+            } 
+            this.oDialog.then(function(oDialog) {
+                oDialog.open();
+            });
         },
+
+
+
 
         onChangeMOP: function (oEvent) {
             let sSelectedKey = oEvent.getParameter("selectedItem").getProperty("key");
@@ -64,25 +67,40 @@ sap.ui.define([
                 this.fnDisplayMsg(sMsgcod);
             };
         },
+      
+      onPressCheckout: function (){
 
-        onPressCheckout: function (){
-            let oInputFNameValue = this.getView().byId("idInptFName").getValue();
-            let oInputLNameValue = this.getView().byId("idInptLName").getValue();
-            let oTextBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            let sMsgempty = oTextBundle.getText("Error1");
-            let sMsgsuccess = oTextBundle.getText("Success");
-            if (oInputFNameValue === "" && oInputLNameValue===""){
-               // sap.m.MessageToast.show("Required Field is blank"); 
-                  this.fnDisplayMsg(sMsgempty);
-                  return;
-            }else{
-                  this.fnDisplayMsg(sMsgsuccess);
-                  return;
-            }
-        },
+         //fragment exercise
+          var oInputFName = this.getView().byId("idInptFName");
+          var oInputLName = this.getView().byId("idInptLName");
+          var oInputFNameValue = oInputFName.getValue();
+          var oInputLNameValue = oInputLName.getValue();
+          var oRouter = this.getOwnerComponent().getRouter();
 
-        fnDisplayMsg: function (sMsg){
-            MessageToast.show(sMsg);
-        },
+         if (oInputFNameValue === "" || oInputLNameValue === ""){
+             
+          // set value state to Error
+              oInputFName.setValueState("Error");
+              oInputLName.setValueState("Error");
+          } else {
+              oInputFName.setValueState("None");
+              oInputLName.setValueState("None");
+          
+          //Navigate to review page passing first
+              oRouter.navTo("RouteReviewPage", {
+                  firstName: oInputFNameValue
+              });
+          
+          }         
+      },
+
+  onCloseDialog: function (){
+      this.getView().byId("idProductDialog").close();
+      },
+
+   fnDisplayMsg: function (sMsg){
+        MessageToast.show(sMsg);
+    }
+
     });
 });
